@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	function "ascii-art/functions"
+	"ascii-art-output/functions"
 )
 
 func main() {
@@ -23,18 +23,20 @@ func main() {
 	if len(Args) > 3 {
 		template = os.Args[3]
 	} else {
-		template = "standard.txt"
+		template = "standard"
 	}
 
 	// extract data from the  file as an array of caracters
 
-	data := function.ReadFile("./banners/" + template + ".txt")
+	data := functions.ReadFile("./banners/" + template + ".txt")
 	test := strings.Join(data, "\n")
 	databyte := []byte(test)
 
 	// extract the file result
-	resultFile = function.Extract_File_Name(resultFile)
+	resultFile = functions.Extract_File_Name(resultFile)
 
 	// send this args to trairment and print inside this function
-	function.TraitmentData(databyte, str, resultFile)
+	functions.TraitmentData(databyte, str, resultFile)
+
+	////////////// so the project is done ////////////////////////
 }
