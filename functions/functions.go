@@ -38,7 +38,7 @@ func Extract_Result_File_Name(resultFile string) string {
 
 // this is the the traitment functions
 func TraitmentData(text []byte, arg, resultFile string, status bool) {
-	// cheeck if the char is in range or not
+	// cheeck if the char is in range or not if not keep proceces
 	for _, char := range arg {
 		if char < 32 || char > 126 {
 			fmt.Println("Ereur : one of this carcters is not in range")
