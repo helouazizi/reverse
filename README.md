@@ -1,4 +1,5 @@
-# ascii-art-output
+# ascii-art
+
 
 This project is designed to accept a string and output formatted ASCII art into a specified text file. The user can customize the output using flags and banners.
 `standard.txt` The primary functionality ensures that the output file is generated based on the specified command-line options.
