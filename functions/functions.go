@@ -3,7 +3,6 @@ package functions
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -23,21 +22,8 @@ func ReadFile(filename string) []string {
 	return result
 }
 
-// the result file name
-func Extract_Result_File_Name(resultFile string) string {
-	if strings.HasPrefix(resultFile, "--output=") && strings.HasSuffix(resultFile, ".txt") || resultFile == "" {
-		re := regexp.MustCompile(`--output=`)
-		resultFile = re.ReplaceAllString(resultFile, "")
-	} else {
-		fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nExample: go run . --output=<fileName.txt> something standard")
-		os.Exit(0)
-	}
-
-	return resultFile
-}
-
 // this is the the traitment functions
-func TraitmentData(text []byte, arg, resultFile string, status bool) {
+func TraitmentData(text []byte, arg, resultFile string) {
 	// cheeck if the char is in range or not if
 	for _, char := range arg {
 		if char < 32 || char > 126 {
@@ -67,7 +53,7 @@ func TraitmentData(text []byte, arg, resultFile string, status bool) {
 	} else {
 		result = Final_result(arrData, words)
 	}
-	if status {
+	if resultFile != "" {
 		os.WriteFile(resultFile, []byte(result), 0o777)
 
 	} else {
@@ -104,9 +90,24 @@ func Final_result(arrData, words []string) string {
 	return result
 }
 
-func TrueOutput(resultFile string) bool {
-	if strings.HasPrefix(resultFile, "--output=") && strings.HasSuffix(resultFile, ".txt") {
-		return true
+// SafeFile checks whether a file path is considered safe for writing
+func SafeFile(path string) bool {
+
+	// Define restricted directories
+	restrictedDirs := []string{
+		"./banners/",
+		"./functions/",
+		"./parser/",
 	}
-	return false
+
+	// Check if the absolute path is within any restricted directories
+	for _, dir := range restrictedDirs {
+		if strings.HasPrefix(path, dir) {
+			return false // Path is inside a restricted directory
+		}
+	}
+	if path == "main.go" || path == "go.mod" {
+		return false
+	}
+	return true
 }
