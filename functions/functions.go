@@ -240,30 +240,38 @@ func LoadBanner(path string) (map[string]rune, error) {
 }
 
 func ReverseAsciiArt(asciiLines []string, charMap map[string]rune) string {
+	if len(asciiLines) != asciiHeight {
+		return "[ERROR: asciiLines must be 8 lines tall]"
+	}
 	result := ""
-	// if len(asciiLines) != asciiHeight {
-	// 	return "[ERROR: asciiLines must be 8 lines tall]"
-	// }
+	pos := 0
+	lineLength := len(asciiLines[0])
 
-	width := len(asciiLines[0])
-	charWidth := 8 // adjust based on actual font
+	for pos < lineLength {
+		matched := false
+		// Try to match the longest possible character block from this position
+		for w := 1; w <= lineLength-pos; w++ {
+			chunk := make([]string, asciiHeight)
+			for i := 0; i < asciiHeight; i++ {
+				chunk[i] = asciiLines[i][pos : pos+w]
+			}
+			key := strings.Join(chunk, "\n")
 
-	for i := 0; i < width; i += charWidth {
-		chunk := make([]string, asciiHeight)
-		for j := 0; j < asciiHeight; j++ {
-			if i+charWidth <= len(asciiLines[j]) {
-				chunk[j] = asciiLines[j][i : i+charWidth]
-			} else {
-				chunk[j] = asciiLines[j][i:] + strings.Repeat(" ", i+charWidth-len(asciiLines[j]))
+			if ch, ok := charMap[key]; ok {
+				result += string(ch)
+				pos += w
+				matched = true
+				break
 			}
 		}
 
-		key := strings.Join(chunk, "\n")
-		if ch, ok := charMap[key]; ok {
-			result += string(ch)
-		} else {
-			result += "?" // unknown character
+		if !matched {
+			// No match found — skip 1 column and append ?
+			result += "?"
+			pos++
 		}
 	}
+
 	return result
 }
+
