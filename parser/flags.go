@@ -19,7 +19,17 @@ func Parse() *Config {
 	message := "Usage: go run . [OPTION] [STRING] [BANNER]\n\nExample: go run . --output=<fileName.txt> something standard"
 	var align string
 	var outputFile string
-
+	//// hhhhhhhhhhhhhhhhhhh
+	for i, arg := range os.Args {
+		if arg == "--align" && i+1 < len(os.Args) {
+			fmt.Println(message)
+			os.Exit(0)
+		}
+		if arg == "--output" && i+1 < len(os.Args) {
+			fmt.Println(message)
+			os.Exit(0)
+		}
+	}
 	// Define flags
 	flag.StringVar(&outputFile, "output", "", "Output file name <exemple.txt>")
 	flag.StringVar(&align, "align", "left", "Text alignment: left, center,right or justify")
@@ -30,7 +40,6 @@ func Parse() *Config {
 	}
 	flag.Parse()
 
-	
 	// check args
 	args := flag.Args()
 	if len(args) < 1 || len(args) > 2 {

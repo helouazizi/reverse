@@ -71,15 +71,17 @@ func TraitmentData(text []byte, arg, resultFile, align string, width int) {
 func Final_result(arrData, words []string, align string, width int) string {
 	result := ""
 	textWidth := 0
+	// fmt.Println(textWidth,"textwidth")
 
 	for k := range words {
 		if words[k] == "" {
+			fmt.Println("some here")
 			result += "\n"
 			continue
 		}
 		// this specialy for justyfy option
-		wordsLength := len(strings.Fields(words[k]))
-		fmt.Println(wordsLength, "tets")
+		wordsLength := len(strings.Split(words[k]," "))
+		// fmt.Println(wordsLength, "wordlength")
 
 		// lets claculate the text with to substract it from the terminal width
 		if k == 0 {
@@ -102,6 +104,9 @@ func Final_result(arrData, words []string, align string, width int) string {
 			}
 			for j := 0; j < len(words[k]); j++ {
 				Ascii := (int(words[k][j] - 32))
+				// fmt.Println(Ascii,string(words[k][j]),"debud")
+				start := Ascii*8 + Ascii + 1 + i
+				result += arrData[start]
 				if Ascii == 0 && align == "justify" {
 					// in this part we need to detect if the length odd or even
 					var spaceToAdd int
@@ -110,14 +115,13 @@ func Final_result(arrData, words []string, align string, width int) string {
 						spaceToAdd += spaceToAdd / (wordsLength - 1)
 					}
 					result += fmt.Sprintf("%*s", spaceToAdd, "")
+					// continue
 				}
-				start := Ascii*8 + Ascii + 1 + i
-				result += arrData[start]
 			}
 			result += "\n"
 		}
 	}
-
+	// result = strings.TrimSuffix(result," ")
 	return result
 }
 
