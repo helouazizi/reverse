@@ -12,6 +12,7 @@ type Config struct {
 	Align      string
 	StringArg  string
 	Banner     string
+	Color      string
 }
 
 func Parse() *Config {
@@ -19,6 +20,7 @@ func Parse() *Config {
 	message := "Usage: go run . [OPTION] [STRING] [BANNER]\n\nExample: go run . --output=<fileName.txt> something standard"
 	var align string
 	var outputFile string
+	var color string
 	//// hhhhhhhhhhhhhhhhhhh
 	for i, arg := range os.Args {
 		if arg == "--align" && i+1 < len(os.Args) {
@@ -29,10 +31,15 @@ func Parse() *Config {
 			fmt.Println(message)
 			os.Exit(0)
 		}
+		if arg == "--color" && i+1 < len(os.Args) {
+			fmt.Println(message)
+			os.Exit(0)
+		}
 	}
 	// Define flags
 	flag.StringVar(&outputFile, "output", "", "Output file name <exemple.txt>")
 	flag.StringVar(&align, "align", "left", "Text alignment: left, center,right or justify")
+	flag.StringVar(&color, "color", "", "color text <red>")
 	flag.Usage = func() {
 		// fmt.Println(message)
 		flag.PrintDefaults()
@@ -77,5 +84,6 @@ func Parse() *Config {
 		Align:      align,
 		StringArg:  inputString,
 		Banner:     banner,
+		Color: color,
 	}
 }

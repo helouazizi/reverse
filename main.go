@@ -13,5 +13,5 @@ func main() {
 	databyte := []byte(test)
 	width := functions.GetTerminalWidth()
 
-	functions.TraitmentData(databyte, cf.StringArg, cf.OutputFile, cf.Align, width)
+	functions.TraitmentData(databyte, cf.StringArg, cf.OutputFile, cf.Align, cf.Color, width)
 }

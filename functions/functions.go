@@ -25,7 +25,7 @@ func ReadFile(filename string) []string {
 }
 
 // this is the the traitment functions
-func TraitmentData(text []byte, arg, resultFile, align string, width int) {
+func TraitmentData(text []byte, arg, resultFile, align,color string, width int) {
 	// cheeck if the char is in range or not if
 	for _, char := range arg {
 		if char < 32 || char > 126 {
@@ -61,9 +61,8 @@ func TraitmentData(text []byte, arg, resultFile, align string, width int) {
 	}
 	if resultFile != "" {
 		os.WriteFile(resultFile, []byte(result), 0o777)
-
 	} else {
-		fmt.Printf("%s", result)
+		PrintColored(result,color)
 	}
 }
 
@@ -80,7 +79,7 @@ func Final_result(arrData, words []string, align string, width int) string {
 			continue
 		}
 		// this specialy for justyfy option
-		wordsLength := len(strings.Split(words[k]," "))
+		wordsLength := len(strings.Split(words[k], " "))
 		// fmt.Println(wordsLength, "wordlength")
 
 		// lets claculate the text with to substract it from the terminal width
@@ -123,6 +122,27 @@ func Final_result(arrData, words []string, align string, width int) string {
 	}
 	// result = strings.TrimSuffix(result," ")
 	return result
+}
+
+func PrintColored(text string, color string) {
+	colorCodes := map[string]string{
+		"black":   "\033[30m",
+		"red":     "\033[31m",
+		"green":   "\033[32m",
+		"yellow":  "\033[33m",
+		"blue":    "\033[34m",
+		"magenta": "\033[35m",
+		"cyan":    "\033[36m",
+		"white":   "\033[37m",
+	}
+	reset := "\033[0m"
+	code, exists := colorCodes[color]
+	if !exists {
+		fmt.Printf("%s", text) // fallback to normal
+		return
+	}
+
+	fmt.Printf("%s%s%s\n", code, text, reset)
 }
 
 func SafeFile(path string) bool {
