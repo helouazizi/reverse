@@ -103,8 +103,11 @@ func Final_result(arrData, words []string, align string, width int) string {
 			for j := 0; j < len(words[k]); j++ {
 				Ascii := (int(words[k][j] - 32))
 				if Ascii == 0 && align == "justify" {
-					spaceToAdd := (width - textWidth)/wordsLength
-					spaceToAdd += spaceToAdd / (wordsLength -1) 
+					var spaceToAdd int
+					if wordsLength > 1 {
+						spaceToAdd = (width - textWidth) / wordsLength
+						spaceToAdd += spaceToAdd / (wordsLength - 1)
+					}
 					result += fmt.Sprintf("%*s", spaceToAdd, "")
 				}
 				start := Ascii*8 + Ascii + 1 + i
