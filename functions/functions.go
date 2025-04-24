@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,7 +26,7 @@ func ReadFile(filename string) []string {
 }
 
 // this is the the traitment functions
-func TraitmentData(text []byte, arg, resultFile, align,color string, width int) {
+func TraitmentData(text []byte, arg, resultFile, align, color string, width int) {
 	// cheeck if the char is in range or not if
 	for _, char := range arg {
 		if char < 32 || char > 126 {
@@ -62,7 +63,7 @@ func TraitmentData(text []byte, arg, resultFile, align,color string, width int) 
 	if resultFile != "" {
 		os.WriteFile(resultFile, []byte(result), 0o777)
 	} else {
-		PrintColored(result,color)
+		PrintColored(result, color)
 	}
 }
 
@@ -188,4 +189,81 @@ func GetTerminalWidth() int {
 		}
 	}
 	return 80
+}
+
+// /////////////////////////////////////////////////////////////////////////////////////////
+const asciiHeight = 8
+
+func LoadBanner(path string) (map[string]rune, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	banner := make(map[string]rune)
+
+	var lines []string
+	charRune := rune(32) // ASCII starts at 32 for printable characters
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		// Skip empty lines between blocks
+		if len(lines) == 0 && line == "" {
+			continue
+		}
+
+		lines = append(lines, line)
+
+		// When a full character block is read
+		if len(lines) == asciiHeight {
+			// Normalize: make sure all lines are the same length
+			// maxLen := 0
+			// for _, l := range lines {
+			// 	if len(l) > maxLen {
+			// 		maxLen = len(l)
+			// 	}
+			// }
+			// for i := range lines {
+			// 	lines[i] = lines[i] + strings.Repeat(" ", maxLen-len(lines[i]))
+			// }
+
+			banner[strings.Join(lines, "\n")] = charRune
+			charRune++
+			lines = []string{}
+		}
+	}
+
+	return banner, nil
+}
+
+func ReverseAsciiArt(asciiLines []string, charMap map[string]rune) string {
+	result := ""
+	// if len(asciiLines) != asciiHeight {
+	// 	return "[ERROR: asciiLines must be 8 lines tall]"
+	// }
+
+	width := len(asciiLines[0])
+	charWidth := 8 // adjust based on actual font
+
+	for i := 0; i < width; i += charWidth {
+		chunk := make([]string, asciiHeight)
+		for j := 0; j < asciiHeight; j++ {
+			if i+charWidth <= len(asciiLines[j]) {
+				chunk[j] = asciiLines[j][i : i+charWidth]
+			} else {
+				chunk[j] = asciiLines[j][i:] + strings.Repeat(" ", i+charWidth-len(asciiLines[j]))
+			}
+		}
+
+		key := strings.Join(chunk, "\n")
+		if ch, ok := charMap[key]; ok {
+			result += string(ch)
+		} else {
+			result += "?" // unknown character
+		}
+	}
+	return result
 }

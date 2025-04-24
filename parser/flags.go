@@ -13,14 +13,13 @@ type Config struct {
 	StringArg  string
 	Banner     string
 	Color      string
+	Reverse    string
 }
 
 func Parse() *Config {
 	// Set defaults
 	message := "Usage: go run . [OPTION] [STRING] [BANNER]\n\nExample: go run . --output=<fileName.txt> something standard"
-	var align string
-	var outputFile string
-	var color string
+
 	//// hhhhhhhhhhhhhhhhhhh
 	for i, arg := range os.Args {
 		if arg == "--align" && i+1 < len(os.Args) {
@@ -35,11 +34,20 @@ func Parse() *Config {
 			fmt.Println(message)
 			os.Exit(0)
 		}
+		if arg == "--reverse" && i+1 < len(os.Args) {
+			fmt.Println(message)
+			os.Exit(0)
+		}
 	}
+	var align string
+	var outputFile string
+	var color string
+	var reverse string
 	// Define flags
 	flag.StringVar(&outputFile, "output", "", "Output file name <exemple.txt>")
 	flag.StringVar(&align, "align", "left", "Text alignment: left, center,right or justify")
 	flag.StringVar(&color, "color", "", "color text <red>")
+	flag.StringVar(&reverse, "reverse", "", "reverse file <file.txt>")
 	flag.Usage = func() {
 		// fmt.Println(message)
 		flag.PrintDefaults()
@@ -78,12 +86,12 @@ func Parse() *Config {
 		fmt.Println(message)
 		os.Exit(0)
 	}
-
 	return &Config{
 		OutputFile: outputFile,
 		Align:      align,
 		StringArg:  inputString,
 		Banner:     banner,
-		Color: color,
+		Color:      color,
+		Reverse:    reverse,
 	}
 }
