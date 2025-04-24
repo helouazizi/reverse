@@ -103,6 +103,7 @@ func Final_result(arrData, words []string, align string, width int) string {
 			for j := 0; j < len(words[k]); j++ {
 				Ascii := (int(words[k][j] - 32))
 				if Ascii == 0 && align == "justify" {
+					// in this part we need to detect if the length odd or even
 					var spaceToAdd int
 					if wordsLength > 1 {
 						spaceToAdd = (width - textWidth) / wordsLength
