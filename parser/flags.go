@@ -22,7 +22,7 @@ func Parse() *Config {
 
 	// Define flags
 	flag.StringVar(&outputFile, "output", "", "Output file name <exemple.txt>")
-	flag.StringVar(&align, "align", "right", "Text alignment: left, center,right or justify")
+	flag.StringVar(&align, "align", "left", "Text alignment: left, center,right or justify")
 	flag.Usage = func() {
 		// fmt.Println(message)
 		flag.PrintDefaults()

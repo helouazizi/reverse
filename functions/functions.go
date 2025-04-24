@@ -3,6 +3,8 @@ package functions
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -23,7 +25,7 @@ func ReadFile(filename string) []string {
 }
 
 // this is the the traitment functions
-func TraitmentData(text []byte, arg, resultFile string) {
+func TraitmentData(text []byte, arg, resultFile, align string, width int) {
 	// cheeck if the char is in range or not if
 	for _, char := range arg {
 		if char < 32 || char > 126 {
@@ -47,41 +49,69 @@ func TraitmentData(text []byte, arg, resultFile string) {
 	}
 	// in case the data is all new line
 	if count == (len(arg)/2)+1 {
-		for i := 0; i < (len(arg) / 2); i++ {
+		for range len(arg) / 2 {
 			result += "\n"
 		}
 	} else {
-		result = Final_result(arrData, words)
+		if resultFile != "" {
+			result = Final_result(arrData, words, "left", width)
+		} else {
+			result = Final_result(arrData, words, align, width)
+		}
 	}
 	if resultFile != "" {
 		os.WriteFile(resultFile, []byte(result), 0o777)
 
 	} else {
-		fmt.Print(result)
+		fmt.Printf("%s", result)
 	}
-
 }
 
 // traitment the data if it have charachters
-func Final_result(arrData, words []string) string {
+func Final_result(arrData, words []string, align string, width int) string {
 	result := ""
-	for k := 0; k < len(words); k++ {
+	textWidth := 0
+
+	for k := range words {
 		if words[k] == "" {
 			result += "\n"
 			continue
 		}
-		for i := 0; i < 8; i++ {
+		// this specialy for justyfy option
+		wordsLength := len(strings.Fields(words[k]))
+		fmt.Println(wordsLength, "tets")
+
+		// lets claculate the text with to substract it from the terminal width
+		if k == 0 {
 			for j := 0; j < len(words[k]); j++ {
 				Ascii := (int(words[k][j] - 32))
+				start := Ascii*8 + Ascii + 1
+				textWidth += len(arrData[start])
+			}
+		}
 
-				start := Ascii*8 + Ascii + 1 + i
-				if words[k][j] < 32 || words[k][j] > 126 {
-					fmt.Println(" error : one of this charachter not in range ")
-					os.Exit(0)
-				} else {
-					result += arrData[start]
+		for i := range 8 {
+			// lets play some game with spaces depend on the alignment flag
+			if align == "right" {
+				spaceToAdd := width - textWidth
+				result += fmt.Sprintf("%*s", spaceToAdd, "")
+			}
+			if align == "center" {
+				spaceToAdd := width/2 - textWidth/2
+				result += fmt.Sprintf("%*s", spaceToAdd, "")
+			}
+			for j := 0; j < len(words[k]); j++ {
+				Ascii := (int(words[k][j] - 32))
+				if Ascii == 0 && align == "justify" {
+					spaceToAdd := (width - textWidth)/wordsLength
+					spaceToAdd += spaceToAdd / (wordsLength -1) 
+					// if wordsLength == 2 {
+					// 	spaceToAdd = (width - textWidth)/1
+					// }
+					result += fmt.Sprintf("%*s", spaceToAdd, "")
 				}
-
+				start := Ascii*8 + Ascii + 1 + i
+				result += arrData[start]
 			}
 			result += "\n"
 		}
@@ -90,7 +120,6 @@ func Final_result(arrData, words []string) string {
 	return result
 }
 
-// SafeFile checks whether a file path is considered safe for writing
 func SafeFile(path string) bool {
 
 	// Define restricted directories
@@ -110,4 +139,28 @@ func SafeFile(path string) bool {
 		return false
 	}
 	return true
+}
+
+func GetTerminalWidth() int {
+	// First, try to fetch the terminal width from the $COLUMNS environment variable
+	widthStr := os.Getenv("COLUMNS")
+	if widthStr != "" {
+		// If the environment variable exists, try to convert it to an integer
+		width, err := strconv.Atoi(widthStr)
+		if err == nil {
+			return width
+		}
+	}
+
+	// If $COLUMNS is not set or invalid, try `tput cols`
+	cmd := exec.Command("tput", "cols")
+	output, err := cmd.Output()
+	if err == nil {
+		// If `tput` works, convert the output to an integer
+		width, err := strconv.Atoi(strings.TrimSpace(string(output)))
+		if err == nil {
+			return width
+		}
+	}
+	return 80
 }
